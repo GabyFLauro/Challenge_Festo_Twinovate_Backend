@@ -37,15 +37,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/medicos")
-    public ResponseEntity<List<Usuario>> listarMedicos(
-            @RequestParam(required = false) String especialidade) {
-        List<Usuario> medicos;
-        if (especialidade != null && !especialidade.isEmpty()) {
-            medicos = usuarioService.buscarMedicosPorEspecialidade(especialidade);
-        } else {
-            medicos = usuarioService.listarMedicos();
-        }
-        return ResponseEntity.ok(medicos);
+    public ResponseEntity<List<Usuario>> listarMedicos() {
+        return ResponseEntity.ok(usuarioService.listarMedicos());
     }
 
     @PostMapping

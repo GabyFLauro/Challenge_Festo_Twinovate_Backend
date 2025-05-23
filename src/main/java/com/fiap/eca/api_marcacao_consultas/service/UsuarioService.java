@@ -28,16 +28,6 @@ public class UsuarioService {
         return usuarioRepository.findByTipo("MEDICO");
     }
 
-    public List<Usuario> buscarMedicosPorEspecialidade(String especialidade) {
-        // Esta implementação depende de como você relaciona médicos com especialidades
-        // Se você tiver um relacionamento direto, pode usar:
-        // return usuarioRepository.findByTipoAndEspecialidade("MEDICO", especialidade);
-
-        // Caso contrário, você precisará implementar uma lógica personalizada
-        // Esta é uma implementação simplificada:
-        return usuarioRepository.findByTipo("MEDICO");
-    }
-
     public Usuario salvarUsuario(Usuario usuario) {
         // Verifica se o e-mail já está cadastrado
         Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(usuario.getEmail());
