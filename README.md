@@ -1,4 +1,4 @@
-Sprint 01 - Advanced Programming & Mobile Dev - 3ECA_FIAP_2025 - Twinovate_Challenge_Festo
+Sprint 02 - Advanced Programming & Mobile Dev - 3ECA_FIAP_2025 - Twinovate_Challenge_Festo_Backend
 
 Luana Alves de Santana RM: 98546
 
