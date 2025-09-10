@@ -6,6 +6,7 @@ import com.fiap.eca.api_marcacao_consultas.security.JwtTokenProvider;
 import com.fiap.eca.api_marcacao_consultas.dto.LoginRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -79,6 +80,24 @@ public class UsuarioController {
             return ResponseEntity.ok().body(Map.of("token", token));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+        }
+    }
+
+    /**
+     * Endpoint para admin alterar senha de qualquer usuário
+     */
+    @PutMapping("/{id}/senha")
+    public ResponseEntity<?> alterarSenhaUsuario(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        try {
+            String novaSenha = request.get("novaSenha");
+            if (novaSenha == null || novaSenha.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nova senha é obrigatória");
+            }
+
+            Usuario usuario = usuarioService.alterarSenha(id, novaSenha);
+            return ResponseEntity.ok().body(Map.of("message", "Senha alterada com sucesso", "usuario", usuario.getNome()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

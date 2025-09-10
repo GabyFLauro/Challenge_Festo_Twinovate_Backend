@@ -59,4 +59,15 @@ public class UsuarioService {
     public Optional<Usuario> buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }
+
+    public Usuario alterarSenha(Long id, String novaSenha) {
+        Optional<Usuario> existingUser = usuarioRepository.findById(id);
+        if (existingUser.isEmpty()) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+
+        Usuario userToUpdate = existingUser.get();
+        userToUpdate.setSenha(passwordEncoder.encode(novaSenha));
+        return usuarioRepository.save(userToUpdate);
+    }
 } 
