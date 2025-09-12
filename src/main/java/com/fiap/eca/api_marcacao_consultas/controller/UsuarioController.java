@@ -5,6 +5,7 @@ import com.fiap.eca.api_marcacao_consultas.service.UsuarioService;
 import com.fiap.eca.api_marcacao_consultas.security.JwtTokenProvider;
 import com.fiap.eca.api_marcacao_consultas.dto.LoginRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +38,7 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/medicos")
-    public ResponseEntity<List<Usuario>> listarMedicos() {
-        return ResponseEntity.ok(usuarioService.listarMedicos());
-    }
+    // Removido endpoint de médicos
 
     @PostMapping
     public ResponseEntity<?> criarUsuario(@RequestBody Usuario usuario) {
@@ -80,6 +78,22 @@ public class UsuarioController {
             return ResponseEntity.ok().body(Map.of("token", token));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+        }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing Bearer token");
+        }
+        String token = authorization.substring(7);
+        try {
+            String email = jwtTokenProvider.obterEmailDoToken(token);
+            return usuarioService.buscarPorEmail(email)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado"));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
         }
     }
 

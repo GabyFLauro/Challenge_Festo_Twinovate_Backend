@@ -24,9 +24,11 @@ public class UsuarioService {
         return usuarioRepository.findById(id);
     }
 
-    public List<Usuario> listarMedicos() {
-        return usuarioRepository.findByTipo("MEDICO");
+    public Optional<Usuario> buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
     }
+
+    // Removido suporte a médicos/pacientes
 
     public Usuario salvarUsuario(Usuario usuario) {
         // Verifica se o e-mail já está cadastrado
@@ -61,10 +63,7 @@ public class UsuarioService {
             usuarioExistente.setSenha(passwordEncoder.encode(usuario.getSenha()));
         }
 
-        // Atualiza o tipo apenas se for fornecido
-        if (usuario.getTipo() != null && !usuario.getTipo().isEmpty()) {
-            usuarioExistente.setTipo(usuario.getTipo());
-        }
+        // Tipo removido
 
         return usuarioRepository.save(usuarioExistente);
     }

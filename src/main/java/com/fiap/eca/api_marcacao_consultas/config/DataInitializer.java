@@ -1,7 +1,9 @@
 package com.fiap.eca.api_marcacao_consultas.config;
 
 import com.fiap.eca.api_marcacao_consultas.model.Usuario;
+import com.fiap.eca.api_marcacao_consultas.model.Sensor;
 import com.fiap.eca.api_marcacao_consultas.repository.UsuarioRepository;
+import com.fiap.eca.api_marcacao_consultas.repository.SensorRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -36,7 +38,8 @@ public class DataInitializer {
     @Bean
     @Transactional
     CommandLineRunner initDatabase(
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            SensorRepository sensorRepository) {
 
         return args -> {
             // Verifica se o arquivo de flag existe
@@ -66,73 +69,54 @@ public class DataInitializer {
             admin.setNome("Administrador");
             admin.setEmail("admin@clinica.com");
             admin.setSenha(passwordEncoder.encode("admin123"));
-            admin.setTipo("ADMIN");
             usuarioRepository.save(admin);
             System.out.println("Administrador criado");
 
-            // Criando médicos - cada um associado a uma especialidade
-            List<Usuario> medicos = new ArrayList<>();
-            Map<String, Usuario> medicosPorEspecialidade = new HashMap<>();
-
-            String[][] dadosMedicos = {
-                    { "Dr. Carlos Silva", "carlos.silva@clinica.com", "senha123", "MEDICO", "Cardiologia" },
-                    { "Dra. Ana Oliveira", "ana.oliveira@clinica.com", "senha123", "MEDICO", "Dermatologia" },
-                    { "Dr. Roberto Santos", "roberto.santos@clinica.com", "senha123", "MEDICO", "Ortopedia" },
-                    { "Dra. Juliana Costa", "juliana.costa@clinica.com", "senha123", "MEDICO", "Pediatria" },
-                    { "Dr. Marcelo Lima", "marcelo.lima@clinica.com", "senha123", "MEDICO", "Neurologia" },
-                    { "Dra. Patricia Mendes", "patricia.mendes@clinica.com", "senha123", "MEDICO", "Oftalmologia" },
-                    { "Dr. Ricardo Ferreira", "ricardo.ferreira@clinica.com", "senha123", "MEDICO", "Psiquiatria" },
-                    { "Dra. Camila Rodrigues", "camila.rodrigues@clinica.com", "senha123", "MEDICO", "Ginecologia" },
-                    { "Dr. Felipe Alves", "felipe.alves@clinica.com", "senha123", "MEDICO", "Urologia" },
-                    { "Dra. Beatriz Santos", "beatriz.santos@clinica.com", "senha123", "MEDICO", "Endocrinologia" }
+            // Criando usuários comuns de exemplo
+            List<Usuario> comuns = new ArrayList<>();
+            String[][] dadosComuns = {
+                    { "João Pereira", "joao.pereira@email.com", "senha123" },
+                    { "Maria Souza", "maria.souza@email.com", "senha123" },
+                    { "Pedro Almeida", "pedro.almeida@email.com", "senha123" }
             };
 
-            for (String[] dados : dadosMedicos) {
-                Usuario medico = new Usuario();
-                medico.setNome(dados[0]);
-                medico.setEmail(dados[1]);
-                medico.setSenha(passwordEncoder.encode(dados[2]));
-                medico.setTipo(dados[3]);
-                medico.setEspecialidade(dados[4]);
-                medicos.add(medico);
-                medicosPorEspecialidade.put(dados[4], medico);
+            for (String[] dados : dadosComuns) {
+                Usuario comum = new Usuario();
+                comum.setNome(dados[0]);
+                comum.setEmail(dados[1]);
+                comum.setSenha(passwordEncoder.encode(dados[2]));
+                comuns.add(comum);
             }
 
-            usuarioRepository.saveAll(medicos);
-            System.out.println("Médicos criados: " + medicos.size());
+            usuarioRepository.saveAll(comuns);
+            System.out.println("Usuários comuns criados: " + comuns.size());
 
-            // Criando pacientes
-            List<Usuario> pacientes = new ArrayList<>();
-            String[][] dadosPacientes = {
-                    { "João Pereira", "joao.pereira@email.com", "senha123", "PACIENTE" },
-                    { "Maria Souza", "maria.souza@email.com", "senha123", "PACIENTE" },
-                    { "Pedro Almeida", "pedro.almeida@email.com", "senha123", "PACIENTE" },
-                    { "Lucia Ferreira", "lucia.ferreira@email.com", "senha123", "PACIENTE" },
-                    { "Fernando Gomes", "fernando.gomes@email.com", "senha123", "PACIENTE" },
-                    { "Camila Dias", "camila.dias@email.com", "senha123", "PACIENTE" },
-                    { "Rafael Martins", "rafael.martins@email.com", "senha123", "PACIENTE" },
-                    { "Amanda Rocha", "amanda.rocha@email.com", "senha123", "PACIENTE" },
-                    { "Bruno Castro", "bruno.castro@email.com", "senha123", "PACIENTE" },
-                    { "Carla Mendes", "carla.mendes@email.com", "senha123", "PACIENTE" }
-            };
+            // Criando dados de sensores realistas
+            List<Sensor> sensores = new ArrayList<>();
+            sensores.add(criarSensor(101.3, 100.8, 26.4, true, 0.12, 0.08, 0.10));
+            sensores.add(criarSensor(102.1, 101.6, 25.9, false, 0.15, 0.11, 0.09));
+            sensores.add(criarSensor(99.7,  99.5,  27.2, true, 0.20, 0.14, 0.13));
 
-            for (String[] dados : dadosPacientes) {
-                Usuario paciente = new Usuario();
-                paciente.setNome(dados[0]);
-                paciente.setEmail(dados[1]);
-                paciente.setSenha(passwordEncoder.encode(dados[2]));
-                paciente.setTipo(dados[3]);
-                pacientes.add(paciente);
-            }
-
-            usuarioRepository.saveAll(pacientes);
-            System.out.println("Pacientes criados: " + pacientes.size());
+            sensorRepository.saveAll(sensores);
+            System.out.println("Sensores criados: " + sensores.size());
 
             // Criar o arquivo de flag para indicar que a inicialização foi concluída
             criarArquivoFlag();
 
             System.out.println("Inicialização de dados concluída com sucesso!");
         };
+    }
+
+    private Sensor criarSensor(double p1, double p2, double temp, boolean chave, double vx, double vy, double vz) {
+        Sensor s = new Sensor();
+        s.setPressao01Xgzp701db1r(p1);
+        s.setPressao02Hx710b(p2);
+        s.setTemperaturaDs18b20(temp);
+        s.setChaveFimDeCurso(chave);
+        s.setVibracaoVibX(vx);
+        s.setVibracaoVibY(vy);
+        s.setVibracaoVibZ(vz);
+        return s;
     }
 
     /**
