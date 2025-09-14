@@ -32,13 +32,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/usuarios/login",
-                                "/h2-console/**" // PERMITE ACESSO AO H2
+                                "/h2-console/**", // PERMITE ACESSO AO H2
+                                "/sensores/**" // PERMITE ACESSO TOTAL AOS SENSORES
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll() // Permite criar usuário sem autenticação
                         .requestMatchers(HttpMethod.GET, "/usuarios").authenticated() // Requer autenticação para listar usuários
                         .requestMatchers(HttpMethod.GET, "/usuarios/me").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/sensores").permitAll()
                         .anyRequest().authenticated()
                 )
                 // resto da configuração permanece igual

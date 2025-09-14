@@ -91,11 +91,101 @@ public class DataInitializer {
             usuarioRepository.saveAll(comuns);
             System.out.println("Usuários comuns criados: " + comuns.size());
 
-            // Criando dados de sensores realistas
+            // Criando 1000 registros de sensores com valores realistas e maior variação
             List<Sensor> sensores = new ArrayList<>();
-            sensores.add(criarSensor(101.3, 100.8, 26.4, true, 0.12, 0.08, 0.10));
-            sensores.add(criarSensor(102.1, 101.6, 25.9, false, 0.15, 0.11, 0.09));
-            sensores.add(criarSensor(99.7,  99.5,  27.2, true, 0.20, 0.14, 0.13));
+            
+            // Cenários diferentes para simular condições reais
+            String[] cenarios = {
+                "ambiente_estavel",      // 30% - Ambiente estável
+                "operacao_normal",       // 25% - Operação normal com pequenas variações
+                "vibracao_moderada",     // 20% - Vibração moderada (equipamento em movimento)
+                "pressao_alta",          // 10% - Pressão mais alta (sistema pressurizado)
+                "temperatura_variada",   // 10% - Variações de temperatura (dia/noite)
+                "anomalia_menor",        // 5% - Anomalias menores mas realistas
+            };
+            
+            for (int i = 0; i < 1000; i++) {
+                // Selecionar cenário baseado na distribuição
+                String cenario = selecionarCenario();
+                
+                // Valores base para cada cenário
+                double pressao01Base, pressao02Base, temperaturaBase, vibracaoBase;
+                double variacaoPressao01, variacaoPressao02, variacaoTemperatura, variacaoVibracao;
+                
+                switch (cenario) {
+                    case "ambiente_estavel":
+                        pressao01Base = 1.01; pressao02Base = 0.101; temperaturaBase = 22.0; vibracaoBase = 0.0;
+                        variacaoPressao01 = 0.02; variacaoPressao02 = 0.005; variacaoTemperatura = 0.1; variacaoVibracao = 0.01;
+                        break;
+                    case "operacao_normal":
+                        pressao01Base = 1.02; pressao02Base = 0.102; temperaturaBase = 23.5; vibracaoBase = 0.0;
+                        variacaoPressao01 = 0.05; variacaoPressao02 = 0.01; variacaoTemperatura = 0.3; variacaoVibracao = 0.03;
+                        break;
+                    case "vibracao_moderada":
+                        pressao01Base = 1.03; pressao02Base = 0.103; temperaturaBase = 24.0; vibracaoBase = 0.02;
+                        variacaoPressao01 = 0.08; variacaoPressao02 = 0.015; variacaoTemperatura = 0.5; variacaoVibracao = 0.08;
+                        break;
+                    case "pressao_alta":
+                        pressao01Base = 2.5; pressao02Base = 0.25; temperaturaBase = 26.0; vibracaoBase = 0.01;
+                        variacaoPressao01 = 0.15; variacaoPressao02 = 0.02; variacaoTemperatura = 0.4; variacaoVibracao = 0.05;
+                        break;
+                    case "temperatura_variada":
+                        pressao01Base = 1.01; pressao02Base = 0.101; temperaturaBase = 25.0; vibracaoBase = 0.0;
+                        variacaoPressao01 = 0.06; variacaoPressao02 = 0.012; variacaoTemperatura = 1.5; variacaoVibracao = 0.04;
+                        break;
+                    case "anomalia_menor":
+                        pressao01Base = 1.05; pressao02Base = 0.108; temperaturaBase = 24.5; vibracaoBase = 0.03;
+                        variacaoPressao01 = 0.12; variacaoPressao02 = 0.025; variacaoTemperatura = 0.8; variacaoVibracao = 0.12;
+                        break;
+                    default:
+                        pressao01Base = 1.01; pressao02Base = 0.101; temperaturaBase = 22.44; vibracaoBase = 0.0;
+                        variacaoPressao01 = 0.05; variacaoPressao02 = 0.01; variacaoTemperatura = 0.2; variacaoVibracao = 0.05;
+                }
+                
+                // Gerar valores aleatórios dentro das faixas do cenário
+                double pressao01 = pressao01Base + (Math.random() - 0.5) * 2 * variacaoPressao01;
+                double pressao02 = pressao02Base + (Math.random() - 0.5) * 2 * variacaoPressao02;
+                double temperatura = temperaturaBase + (Math.random() - 0.5) * 2 * variacaoTemperatura;
+                
+                // Chave fim de curso: variação baseada no cenário
+                boolean chaveFimDeCurso;
+                if (cenario.equals("operacao_normal") || cenario.equals("vibracao_moderada")) {
+                    chaveFimDeCurso = Math.random() < 0.8; // Mais ativa durante operação
+                } else if (cenario.equals("anomalia_menor")) {
+                    chaveFimDeCurso = Math.random() < 0.4; // Menos ativa durante anomalias
+                } else {
+                    chaveFimDeCurso = Math.random() < 0.7; // Normal
+                }
+                
+                // Vibrações: variação baseada no cenário
+                double vibracaoX = vibracaoBase + (Math.random() - 0.5) * 2 * variacaoVibracao;
+                double vibracaoY = vibracaoBase + (Math.random() - 0.5) * 2 * variacaoVibracao;
+                double vibracaoZ = vibracaoBase + (Math.random() - 0.5) * 2 * variacaoVibracao;
+                
+                // Adicionar correlações realistas entre sensores
+                if (cenario.equals("temperatura_variada")) {
+                    // Temperatura alta pode afetar pressão
+                    if (temperatura > temperaturaBase + 0.5) {
+                        pressao01 += 0.02;
+                        pressao02 += 0.002;
+                    }
+                }
+                
+                if (cenario.equals("vibracao_moderada")) {
+                    // Vibração pode afetar leituras de pressão
+                    double fatorVibracao = Math.sqrt(vibracaoX*vibracaoX + vibracaoY*vibracaoY + vibracaoZ*vibracaoZ);
+                    pressao01 += fatorVibracao * 0.01;
+                    pressao02 += fatorVibracao * 0.001;
+                }
+                
+                // Garantir que os valores estão dentro dos limites físicos
+                pressao01 = Math.max(0, Math.min(7.0, pressao01)); // 0-7 bar
+                pressao02 = Math.max(0, Math.min(0.4, pressao02)); // 0-0.4 bar
+                temperatura = Math.max(-55, Math.min(125, temperatura)); // -55 a 125°C
+                
+                sensores.add(criarSensor(pressao01, pressao02, temperatura, chaveFimDeCurso, 
+                                       vibracaoX, vibracaoY, vibracaoZ));
+            }
 
             sensorRepository.saveAll(sensores);
             System.out.println("Sensores criados: " + sensores.size());
@@ -117,6 +207,16 @@ public class DataInitializer {
         s.setVibracaoVibY(vy);
         s.setVibracaoVibZ(vz);
         return s;
+    }
+
+    private String selecionarCenario() {
+        double random = Math.random();
+        if (random < 0.30) return "ambiente_estavel";      // 30%
+        if (random < 0.55) return "operacao_normal";       // 25%
+        if (random < 0.75) return "vibracao_moderada";     // 20%
+        if (random < 0.85) return "pressao_alta";          // 10%
+        if (random < 0.95) return "temperatura_variada";   // 10%
+        return "anomalia_menor";                           // 5%
     }
 
     /**
