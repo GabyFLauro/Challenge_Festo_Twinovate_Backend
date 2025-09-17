@@ -1,7 +1,7 @@
 package com.fiap.eca.controller;
 
 import com.fiap.eca.model.Reading;
-import com.fiap.eca.service.ReadingService;
+import com.fiap.eca.service.api.ReadingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +13,11 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ReadingController {
     
-    @Autowired
-    private ReadingService readingService;
+    private final ReadingService readingService;
+
+    public ReadingController(ReadingService readingService) {
+        this.readingService = readingService;
+    }
     
     @PostMapping
     public ResponseEntity<Reading> createReading(@RequestBody Reading reading) {

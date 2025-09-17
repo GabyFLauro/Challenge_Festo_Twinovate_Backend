@@ -1,7 +1,9 @@
 package com.fiap.eca.controller;
 
 import com.fiap.eca.model.Usuario;
-import com.fiap.eca.service.UsuarioService;
+import com.fiap.eca.dto.UsuarioRequest;
+import com.fiap.eca.dto.UsuarioResponse;
+import com.fiap.eca.service.api.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,27 +16,37 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @PostMapping
-    public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario) {
+    public ResponseEntity<UsuarioResponse> cadastrar(@RequestBody @jakarta.validation.Valid UsuarioRequest request) {
+        Usuario usuario = new Usuario();
+        usuario.setNome(request.getNome());
+        usuario.setEmail(request.getEmail());
+        usuario.setSenha(request.getSenha());
         Usuario novoUsuario = usuarioService.cadastrar(usuario);
-        return ResponseEntity.ok(novoUsuario);
+        return ResponseEntity.ok(new UsuarioResponse(novoUsuario.getId(), novoUsuario.getNome(), novoUsuario.getEmail(), novoUsuario.getRole()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<UsuarioResponse> buscarPorId(@PathVariable Long id) {
         return usuarioService.buscarPorId(id)
-                .map(ResponseEntity::ok)
+                .map(u -> ResponseEntity.ok(new UsuarioResponse(u.getId(), u.getNome(), u.getEmail(), u.getRole())))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> atualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
+    public ResponseEntity<UsuarioResponse> atualizar(@PathVariable Long id, @RequestBody @jakarta.validation.Valid UsuarioRequest request) {
         try {
-            Usuario usuarioAtualizado = usuarioService.atualizar(id, usuario);
-            return ResponseEntity.ok(usuarioAtualizado);
+            Usuario updates = new Usuario();
+            updates.setNome(request.getNome());
+            updates.setSenha(request.getSenha());
+            Usuario usuarioAtualizado = usuarioService.atualizar(id, updates);
+            return ResponseEntity.ok(new UsuarioResponse(usuarioAtualizado.getId(), usuarioAtualizado.getNome(), usuarioAtualizado.getEmail(), usuarioAtualizado.getRole()));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

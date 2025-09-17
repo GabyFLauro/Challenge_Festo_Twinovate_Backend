@@ -1,9 +1,11 @@
-package com.fiap.eca.api_marcacao_consultas.repository;
+package com.fiap.eca.repository;
 
-import com.fiap.eca.api_marcacao_consultas.model.Sensor;
+import com.fiap.eca.model.Sensor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SensorRepository extends JpaRepository<Sensor, Long> {
 }
+
+

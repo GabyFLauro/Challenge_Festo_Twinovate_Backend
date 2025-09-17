@@ -1,7 +1,7 @@
-package com.fiap.eca.api_marcacao_consultas.controller;
+package com.fiap.eca.controller;
 
-import com.fiap.eca.api_marcacao_consultas.model.Sensor;
-import com.fiap.eca.api_marcacao_consultas.service.SensorService;
+import com.fiap.eca.model.Sensor;
+import com.fiap.eca.service.api.SensorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,3 +23,5 @@ public class SensorController {
         return ResponseEntity.ok(sensorService.listarSensores());
     }
 }
+
+

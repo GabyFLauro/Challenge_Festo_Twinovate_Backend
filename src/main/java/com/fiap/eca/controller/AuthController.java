@@ -17,17 +17,18 @@ import java.util.Optional;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
+    private final TokenService tokenService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public AuthController(UsuarioService usuarioService, TokenService tokenService, PasswordEncoder passwordEncoder) {
+        this.usuarioService = usuarioService;
+        this.tokenService = tokenService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<?> login(@RequestBody @jakarta.validation.Valid LoginDTO loginDTO) {
         Optional<Usuario> usuario = usuarioService.buscarPorEmail(loginDTO.getEmail());
         
         if (usuario.isPresent() && passwordEncoder.matches(loginDTO.getSenha(), usuario.get().getSenha())) {
