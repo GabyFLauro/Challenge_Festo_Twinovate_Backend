@@ -79,8 +79,13 @@
 			<artifactId>jjwt-api</artifactId>
 			<version>0.12.5</version>
 		</dependency>
+        <dependency>
+            <groupId>com.fiap.eca</groupId>
+            <artifactId>api_marcacao_consultas</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

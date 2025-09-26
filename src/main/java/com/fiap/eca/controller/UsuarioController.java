@@ -4,7 +4,6 @@ import com.fiap.eca.model.Usuario;
 import com.fiap.eca.dto.UsuarioRequest;
 import com.fiap.eca.dto.UsuarioResponse;
 import com.fiap.eca.service.api.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -29,7 +28,8 @@ public class UsuarioController {
         usuario.setEmail(request.getEmail());
         usuario.setSenha(request.getSenha());
         Usuario novoUsuario = usuarioService.cadastrar(usuario);
-        return ResponseEntity.ok(new UsuarioResponse(novoUsuario.getId(), novoUsuario.getNome(), novoUsuario.getEmail(), novoUsuario.getRole()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new UsuarioResponse(novoUsuario.getId(), novoUsuario.getNome(), novoUsuario.getEmail(), novoUsuario.getRole()));
     }
 
     @GetMapping("/{id}")
@@ -66,7 +66,7 @@ public class UsuarioController {
      * Endpoint para admin alterar senha de qualquer usuário
      */
     @PutMapping("/{id}/senha")
-    public ResponseEntity<?> alterarSenhaUsuario(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    public ResponseEntity<Object> alterarSenhaUsuario(@PathVariable Long id, @RequestBody Map<String, String> request) {
         try {
             String novaSenha = request.get("novaSenha");
             if (novaSenha == null || novaSenha.trim().isEmpty()) {
@@ -79,4 +79,4 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-} 
+}

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "usuarios")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,4 +21,8 @@ public class Usuario {
     private String nome;
     private String senha;
     private String role; // ROLE_USER, ROLE_ADMIN
-} 
+
+    public String getSenha() {
+        return this.senha;
+    }
+}

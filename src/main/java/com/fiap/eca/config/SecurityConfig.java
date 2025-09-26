@@ -24,13 +24,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable()) // Desabilita o CORS do Spring Security para usar o do controller
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/usuarios",
                                 "/usuarios/login",
                                 "/auth/login",
-                                "/h2-console/**"
+                                "/h2-console/**",
+                                "/usuarios/**",
+                                "/auth/**"
                         ).permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Libera OPTIONS para CORS
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
@@ -51,4 +55,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-} 
+}

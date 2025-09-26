@@ -2,19 +2,18 @@ package com.fiap.eca.service;
 
 import com.fiap.eca.model.Usuario;
 import com.fiap.eca.repository.UsuarioRepository;
-import com.fiap.eca.service.api.UsuarioService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class UsuarioServiceImpl implements UsuarioService {
+public class UsuarioService implements com.fiap.eca.service.api.UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -26,7 +25,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        if (usuario.getRole() == null) {
+        if (usuario.getRole() == null || usuario.getRole().isEmpty()) {
             usuario.setRole("ROLE_USER");
         }
 
