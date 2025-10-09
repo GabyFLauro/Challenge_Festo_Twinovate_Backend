@@ -1,7 +1,5 @@
 package com.fiap.eca.config;
 
-import com.fiap.eca.security.JwtAuthenticationFilter;
-import com.fiap.eca.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.fiap.eca.security.JwtAuthenticationFilter;
+import com.fiap.eca.security.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity
@@ -30,18 +31,20 @@ public class SecurityConfig {
                                 "/usuarios",
                                 "/usuarios/login",
                                 "/auth/login",
-                                "/h2-console/**",
                                 "/usuarios/**",
-                                "/auth/**"
+                                "/auth/**",
+                                "/sensors",
+                                "/sensors/**",
+                                "/sensores",
+                                "/sensores/**",
+                                "/readings",
+                                "/readings/**"
                         ).permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Libera OPTIONS para CORS
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.disable())
-                        .contentSecurityPolicy(csp -> csp
-                                .policyDirectives("script-src 'self' 'unsafe-inline'")
-                        )
+                        .frameOptions(frame -> frame.deny())
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), 
                         UsernamePasswordAuthenticationFilter.class)
